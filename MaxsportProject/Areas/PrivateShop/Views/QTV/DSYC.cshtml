@@ -1,0 +1,125 @@
+﻿@using Ecommerce_KTPM.Models
+@{
+    ViewBag.Title = "Danh sách yêu cầu";
+    TaiKhoanTV t = Session["DangNhap"] as TaiKhoanTV;
+    Layout = "~/Areas/PrivateShop/Views/Shared/_LayoutQTV.cshtml";
+
+}
+@{
+    if (@ViewBag.sc != null)
+    {
+        <p class="alert alert-success">@ViewBag.sc</p>
+    }
+}
+<div style="overflow-y: scroll; height:450px;">
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-light text-center rounded p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">Tất cả yêu cầu</h6>
+            </div>
+            <div class="table-responsive">
+                <table id="orders" class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Người yêu cầu</th>
+                            <th onclick="sortTable(1)">Chủ đề</th>
+                            <th onclick="sortTable(2)">Thời gian</th>
+                            <th onclick="sortTable(3)">Trạng thái</th>
+                            <th onclick="sortTable(4)">Hoạt động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in (new EcommerceEntities().ThongBaos.Where(m => m.TKTV == "admin").OrderByDescending(m => m.ngayTB)))
+                        {
+                            <tr>
+                                <td>@i.TKQT</td>
+                                <td>@i.chuDe</td>
+                                <td>@string.Format("{0:dd/MM/yyyy}", i.ngayTB)</td>
+                                <td>
+                                    @{
+                                        if (i.trangThai != null && i.trangThai.Equals("DG"))
+                                        {
+                                            <span class="btn btn-primary">Đã gửi</span>
+                                        }
+                                        else if (i.trangThai != null && i.trangThai.Equals("DD"))
+                                        {
+                                            <span class="btn btn-success">Đã duyệt</span>
+                                        }
+                                        else if (i.trangThai != null && i.trangThai.Equals("TC"))
+                                        {
+                                            <span class="btn btn-warning">Từ chối</span>
+                                        }
+                                    }
+                                </td>
+                                <td>
+                                    <div style="display: inline-table; ">
+                                        @using (Html.BeginForm("Duyet", "QTV", FormMethod.Post))
+                                        {
+                                            <input type="hidden" name="soTB" value=" @i.soTB" />
+                                            <button title="Duyệt" class="btn btn-outline-success"><i class="far fa-check-circle"></i></button>
+                                        }
+                                    </div>
+                                    <div style="display: inline-table; ">
+                                        @using (Html.BeginForm("TuChoi", "QTV", FormMethod.Post))
+                                        {
+                                            <input type="hidden" name="soTB" value=" @i.soTB" />
+                                            <button title="Từ chối" class="btn btn-outline-warning"><i class="fas fa-ban"></i></button>
+                                        }
+                                    </div>
+                                    <div style="display: inline-table; ">
+                                        @using (Html.BeginForm("XoaYC", "QTV", FormMethod.Post))
+                                        {
+                                            <input type="hidden" name="soTB" value=" @i.soTB" />
+                                            <button title="Xoá" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary" id="@i.soTB" onclick="openModal('@i.soTB')"><i class="fas fa-expand-arrows-alt"></i></button>
+                                    <div id="myModal_@i.soTB" class="modal">
+                                        <div class="modal-content">
+                                            @foreach (ThongBao j in (new EcommerceEntities().ThongBaos.Where(m => m.soTB == i.soTB)))
+                                            {
+                                                <span class="close" onclick="closeModal('@i.soTB')">&times;</span>
+                                                <h3>@j.chuDe</h3>
+                                                <p>@Html.Raw(j.noiDung)</p>
+                                                <p>@string.Format("{0:dd/MM/yy}", j.ngayTB)</p>
+                                            }
+                                        </div>
+                                    </div>                                    
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // hàm mở khung hiển thị
+    var modal
+    function openModal(id) {
+        modal = document.getElementById("myModal_" + id);
+        modal.style.display = "block";
+    }
+
+
+    // hàm đóng khung hiển thị
+    function closeModal(id) {
+        modal = document.getElementById("myModal_" + id);
+        modal.style.display = "none";
+    }
+
+
+    // đóng khung hiển thị khi nhấn vào nút đóng khung hoặc click bên ngoài khung
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+</script>

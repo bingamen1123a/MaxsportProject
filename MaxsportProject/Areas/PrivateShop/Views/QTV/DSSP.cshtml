@@ -1,0 +1,113 @@
+﻿@using Ecommerce_KTPM.Models
+
+@{
+    ViewBag.Title = "Danh sách sản phẩm";
+    TaiKhoanTV t = Session["DangNhap"] as TaiKhoanTV;
+    Layout = "~/Areas/PrivateShop/Views/Shared/_LayoutQTV.cshtml";
+
+}
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
+
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light text-center rounded p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="option-locloaihang">
+                @*<h1 class="page-title-1">LOẠI HÀNG</h1>*@
+                <h6 class="mb-0 page-title-1">Tất cả mặt hàng bán</h6>
+                <select id="select-filter" class="form-select-sm" aria-label=".form-select-sm example" style="margin: 0px 10px 0 4px;">
+                    <option value="show" selected>Danh sách đang hiện</option>
+                    <option value="hide">Danh sách đã ẩn</option>
+                </select>
+                <button type="submit" id="btn-filter">Lọc</button>
+            </div>
+        </div>
+        <div class="row" id="hien">
+            @foreach (SanPham i in DataIn.GetSanPhams().Where(m => m.daDuyet == true))
+            {
+                <div class="danhsachhang-all">
+                    <div><span class="tensp">@i.tenSP</span></div>
+                    <img src="@i.hinhDD" />
+                    <div class="giadanhdachhang-all"><span class="namegia-danhsachhang">Giá: <span class="gia-danhsachhang">@string.Format("{0:#,##0 VNĐ}", i.giaBan - (i.giaBan * i.giamGia / 100))</span></span></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            @using (Html.BeginForm("DeleteSP", "QTV", FormMethod.Post))
+                            {
+                                <input type="hidden" name="masp" value="@i.maSP" />
+                                <button type="submit" title="Xóa sản phẩm" class="btn btn-danger m-2 setboder_radius_0">Xóa</button>
+                            }
+
+                        </div>
+                        <div class="col-md-6">
+                            @using (Html.BeginForm("ActiveSP", "QTV", FormMethod.Post))
+                            {
+                                <input type="hidden" name="masp" value="@i.maSP" />
+                                {
+                                    if (i.daDuyet == true)
+                                    {<button type="submit" class="btn btn-secondary m-2 setboder_radius_0">Đang hiện</button>}
+                                    else
+                                    {<button type="submit" class="btn btn-success m-2 setboder_radius_0">Đã ẩn</button>}
+                                }
+                            }
+
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="row" id="an">
+            @foreach (SanPham i in DataIn.GetSanPhams().Where(m => m.daDuyet == false))
+            {
+                <div class="danhsachhang-all">
+                    <div><span class="tensp">@i.tenSP</span></div>
+                    <img src="@i.hinhDD" />
+                    <div class="giadanhdachhang-all"><span class="namegia-danhsachhang">Giá: <span class="gia-danhsachhang">@string.Format("{0:#,##0 VNĐ}", i.giaBan - (i.giaBan * i.giamGia / 100))</span></span></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            @using (Html.BeginForm("DeleteSP", "QTV", FormMethod.Post))
+                            {
+                                <input type="hidden" name="masp" value="@i.maSP" />
+                                <button type="submit" title="Xóa sản phẩm" class="btn btn-danger m-2 setboder_radius_0">Xóa</button>
+                            }
+
+                        </div>
+                        <div class="col-md-6">
+                            @using (Html.BeginForm("ActiveSP", "QTV", FormMethod.Post))
+                            {
+                                <input type="hidden" name="masp" value="@i.maSP" />
+                                {
+                                    if (i.daDuyet == true)
+                                    {<button type="submit" class="btn btn-secondary m-2 setboder_radius_0">Đang hiện</button>}
+                                    else
+                                    {<button type="submit" class="btn btn-success m-2 setboder_radius_0">Đã ẩn</button>}
+                                }
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@* ẩn hiện sản phẩm (phân trang) *@
+<script>
+    const selectFilter = document.getElementById("select-filter");
+    const btnFilter = document.getElementById("btn-filter");
+    const hiddenProducts = document.getElementById("an");
+    const visibleProducts = document.getElementById("hien");
+    btnFilter.addEventListener("click", function () {
+        if (selectFilter.value === "hide") {
+            hiddenProducts.classList.remove("hidden");
+            visibleProducts.classList.add("hidden");
+        } else {
+            hiddenProducts.classList.add("hidden");
+            visibleProducts.classList.remove("hidden");
+        }
+    });
+</script>

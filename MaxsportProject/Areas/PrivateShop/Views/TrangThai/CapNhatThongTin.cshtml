@@ -1,0 +1,90 @@
+﻿@model Ecommerce_KTPM.Models.TaiKhoanTV
+@using Ecommerce_KTPM.Models
+@{
+    ViewBag.Title = "CapNhatThongTin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    TaiKhoanTV t = Session["DangNhap"] as TaiKhoanTV;
+}
+
+@using (Html.BeginForm("Capnhat", "TrangThai", FormMethod.Post, new { style = "margin: 0 auto" }))
+{
+    if (@ViewBag.sc != null)
+    {
+        <p class="alert alert-success">@ViewBag.sc</p>}
+
+
+    if (ViewBag.usc != null)
+    {
+        <p class="alert alert-warning">@ViewBag.mess</p>
+    }
+    <h3 style="margin-left: 20px; color: red;">Cập nhật thông tin</h3>
+    <div class="update-thongtin" style="margin-left: 20px; width: 80%;">
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <span class="">Họ và tên đệm</span>
+                    @Html.TextBoxFor(m => m.hoDem, new { @class = "form-control", @id = "usr" })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <span class="">Tên</span>
+                    @Html.TextBoxFor(m => m.tenTV, new { @class = "form-control", @id = "usr" })
+                </div>
+            </div>
+        </div>
+        <div class="form-group dinhdang-display-flex">
+            <span class="">Ngày sinh</span>
+            @Html.TextBoxFor(m => m.ngaysinh, new { @class = "form-control", type = "date", @id = "usr" })
+        </div>
+        <div class="form-group">
+            <label for="usr">Số điện thoại</label>
+            @Html.TextBoxFor(m => m.soDT, new { @class = "form-control", @id = "usr" })
+        </div>
+        <div class="form-group">
+            <label for="usr">Email</label>
+            @Html.TextBoxFor(m => m.email, new { @class = "form-control", @id = "usr", type = "Email" })
+        </div>
+        <div class="form-group">
+            <label for="usr">Địa chỉ</label>
+            @Html.TextBoxFor(m => m.diaChi, new { @class = "form-control", @id = "usr" })
+        </div>
+        <button class="btn btn-success" type="submit">Cập nhật</button>
+    </div>
+    @Html.HiddenFor(m => m.TKTV);
+}
+<hr />
+@using (Html.BeginForm("DoiMK", "TrangThai", FormMethod.Post, new { style = "margin: 0 auto" }))
+{
+
+    if (@ViewBag.scmk != null)
+    {
+        <p class="alert alert-success">@ViewBag.scmk</p>}
+
+
+    if (ViewBag.uscmk != null)
+    {
+        <p class="alert alert-warning">@ViewBag.uscmk</p>
+    }
+
+    <h3 style="margin-left: 20px; color: red;">Đổi mật khẩu</h3>
+    <div class="update-thongtin" style="margin-left: 20px; width: 80%;">
+        <div class="form-group">
+            <label for="usr">Mật khẩu hiện tại</label>
+            @Html.TextBoxFor(m => m.matKhau, new { @class = "form-control", type = "password", @id = "usr", placeholder = "Nhập mật khẩu cũ" })
+        </div>
+        <div class="form-group">
+            <label for="usr">Mật khẩu mới</label>
+            @Html.TextBox("mk", "", new { @class = "form-control", type = "password", @id = "usr", placeholder = "Nhập mật khẩu mới" })
+        </div>
+        <div class="form-group">
+            <label for="usr">Nhập lại mật khẩu mới</label>
+            @Html.TextBox("xnmk", "", new { @class = "form-control", type = "password", placeholder = "Nhập lại mật khẩu", @id = "usr" })
+        </div>
+        <button class="btn btn-success" type="submit">Cập nhật</button>
+    </div>
+    @Html.HiddenFor(m => m.TKTV);
+}
+
+
+

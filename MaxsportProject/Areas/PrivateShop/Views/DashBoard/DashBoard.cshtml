@@ -1,0 +1,201 @@
+﻿@using Ecommerce_KTPM.Models
+@{
+    ViewBag.Title = "DashBoard";
+    Layout = "~/Areas/PrivateShop/Views/Shared/_Layout.cshtml";
+    TaiKhoanTV t = Session["DangNhap"] as TaiKhoanTV;
+}
+
+<!-- Sale & Revenue Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-line fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Hàng bán trong ngày</p>
+                    <h6 class="mb-0">@ThongKe.SoLuongDonTrongNgay(DateTime.Today,t.TKTV)</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-bar fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Doanh thu trong ngày</p>
+                    <h6 class="mb-0">@string.Format("{0:#,##0}", ThongKe.DoanhThuTrongNgay(DateTime.Today,t.TKTV))</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-area fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Hàng bán trong Tháng</p>
+                    <h6 class="mb-0">@ThongKe.SoDonTrongThang(DateTime.Now.Month,t.TKTV)</h6>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-pie fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Doanh thu trong tháng</p>
+                    <h6 class="mb-0">@string.Format("{0:#,##0}", ThongKe.DoanhThuTrongThang(DateTime.Now.Month, t.TKTV))</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sale & Revenue End -->
+<!-- Sales Chart Start -->
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-light text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">Doanh thu theo quý (4 tháng)</h6>
+                </div>
+                <canvas id="worldwide-sales"></canvas>
+            </div>
+        </div>
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-light text-center rounded p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">Sản phẩm bán ra trong năm</h6>
+                </div>
+                <canvas id="salse-revenue"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sales Chart End -->
+<!-- Recent Sales Start -->
+<div style="overflow-y: scroll; height:450px;">
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-light text-center rounded p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">Tất cả đơn hàng</h6>
+            </div>
+            <div class="table-responsive">
+                <table id="orders" class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Ngày đặt </th>
+                            <th onclick="sortTable(1)">Mã hàng </th>
+                            <th onclick="sortTable(2)">Thông tin khách hàng</th>
+                            <th onclick="sortTable(3)">Địa chỉ giao </th>
+                            <th onclick="sortTable(4)">Sản phẩm </th>
+                            <th onclick="sortTable(6)" style="width: 125px; }">Hoạt động </th>
+                            <th onclick="sortTable(7)"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (DonHang i in (new EcommerceEntities().DonHangs.Where(m => m.tktv1 == t.TKTV).OrderByDescending(m => m.ngayDat).ToList().Take(5)))
+                        {
+                            <tr>
+                                <td>@string.Format("{0:hh:mm dd/MM/yyyy}", i.ngayDat)</td>
+                                <td>@i.soDH</td>
+                                <td>
+                                    @DataIn.GetGiaoHang(i.tktv2).tenKH<br />
+                                    @DataIn.GetGiaoHang(i.tktv2).soDT
+                                </td>
+                                <td>@DataIn.GetGiaoHang(i.tktv2).diaChi</td>
+                                <td>
+                                    @foreach (CtDonHang a in DataIn.GetCtDonHangs(i.soDH))
+                                    {
+                                        @DataIn.GetProductbyID(a.maSP).tenSP
+                                        <b>&emsp;(@a.soLuong)&emsp;@string.Format("{0:#,##0 VNĐ}", a.giaBan - (a.giaBan * a.giamGia / 100))</b>
+                                        <br />
+                                        <hr />
+                                    }
+                                </td>
+<td>
+                                    @{
+                                        if (i.daKichHoat == true && (i.trangThai == null || i.trangThai == ""))
+                                        {
+                                            <span class="btn btn-info">Đã xác nhận</span>
+                                        }
+                                        else if (i.daKichHoat == false && (i.trangThai == null || i.trangThai == ""))
+                                        {
+                                            <span class="btn btn-info">Đang chờ <br />xác nhận</span>
+
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("TC"))
+                                        {
+                                            <span class="btn btn-success">Thành công</span>
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("HUY"))
+                                        {
+                                            <span class="btn btn-danger">Đã huỷ</span>
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("ChL"))
+                                        {
+                                            <span class="btn btn-info">Chờ lấy hàng</span>
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("DG"))
+                                        {
+                                            <span class="btn btn-info">Đang giao</span>
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("TH"))
+                                        {
+                                            <span class="btn btn-primary">Trả hàng</span>
+                                        }
+                                    }
+                                </td>
+                                <td>
+                                    @using (Html.BeginForm("XemChiTiet", "DonHangBan", FormMethod.Post))
+                                    {
+                                        <input type="hidden" name="maDH" value=" @i.soDH" />
+                                        <button class="btn btn-primary"><i class="fas fa-expand-arrows-alt"></i></button>
+                                    }
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>              
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pagination"></div>
+    <!-- Recent Sales End -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Worldwide Sales Chart
+    var ctx1 = $("#worldwide-sales").get(0).getContext("2d");
+    var myChart1 = new Chart(ctx1, {
+        type: "bar",
+        data: {
+            labels: ["Tháng 1-3", "Tháng 4-6", "Tháng 7-9", "Tháng 10-12"],
+            datasets: [{
+                label: "VNĐ",
+                data: @ThongKe.DoanhThuCacQuyTrongNam(t.TKTV),
+                backgroundColor: "rgba(0, 156, 255, .7)"
+            },
+            ]
+        },
+        options: {
+            responsive: true
+        }
+    });
+    // Salse & Revenue Chart
+    var ctx2 = $("#salse-revenue").get(0).getContext("2d");
+    var myChart2 = new Chart(ctx2, {
+        type: "line",
+        data: {
+            labels: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12",],
+            datasets: [{
+                label: "Sản phẩm bán ra",
+                data: @ThongKe.SoSanPhamBanRaCacThangTrongNam(t.TKTV),
+                backgroundColor: "rgba(0, 156, 255, .5)",
+                fill: true
+            },
+            ]
+        },
+        options: {
+            responsive: true
+        }
+    });
+});
+</script>

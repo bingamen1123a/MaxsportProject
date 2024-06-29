@@ -1,0 +1,272 @@
+﻿@using Ecommerce_KTPM.Models
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Danh sách đơn hàng";
+    TaiKhoanTV t = Session["DangNhap"] as TaiKhoanTV;
+    SanPham l = ViewData["ViewSP"] as SanPham;
+
+}
+<style>
+ .Dd {
+        max-width:90%;
+
+    }
+ ul li {
+     display:inline-table;
+     margin-top:20px;
+     margin-bottom:20px;
+ }
+.Dd1 {
+        background-color: #fffefa;
+        max-width: 100%;
+}
+
+</style>
+<center><h3>Danh sách các đơn hàng đã đặt</h3></center>
+<div class="container Dd">
+    @foreach (DonHang i in (new EcommerceEntities().DonHangs.Where(m => m.tktv2 == t.TKTV).OrderByDescending(m => m.ngayDat).ToList()))
+    {
+        <li style=" list-style: none; float: right; margin: 2%;">
+            @{
+                if (i.daKichHoat == true && (i.trangThai == null || i.trangThai == ""))
+                {
+                    <button class="btn btn-info">Đã xác nhận</button>
+                }
+                else if (i.daKichHoat == false && (i.trangThai == null || i.trangThai == ""))
+                {
+                    <button class="btn btn-info">Đang chờ xác nhận</button>
+
+                }
+                else
+                {
+                    if (i.trangThai != null && i.trangThai.Equals("TC"))
+                    {
+                        <button class="btn btn-success">Thành công</button>
+                    }
+                    else if (i.trangThai != null && i.trangThai.Equals("HUY"))
+                    {
+                        <button class="btn btn-danger">Đã huỷ</button>
+                    }
+                    else if (i.trangThai != null && i.trangThai.Equals("ChL"))
+                    {
+                        <button class="btn btn-info">Chờ lấy hàng</button>
+                    }
+                    else if (i.trangThai != null && i.trangThai.Equals("DG"))
+                    {
+                        <button class="btn btn-info">Đang giao</button>
+                    }
+                    else if (i.trangThai != null && i.trangThai.Equals("TH"))
+                    {
+                        <button class="btn btn-primary">Trả hàng</button>
+                    }
+                }
+            }
+        </li>
+        <div class="bg-light p-30">
+            <div style="display: flex;">
+                <p style="font-weight:bold;">
+                    Shop:
+                    <a style="color:crimson;" href="@Url.Action("ShopTK", "Shop", new {area="",tenTKShop = i.tktv1 })">(@i.tktv1)</a>
+                    Mã vận đơn:
+                    @using (Html.BeginForm("XemChiTiet", "DonHangMua", FormMethod.Post))
+                    {
+                        <button name="maDH" value="@i.soDH" class="btn btn-default btn-sm border-0 bg-transparent">
+                            <a style="color:blue">@i.soDH</a>
+                            <a style="color: red;">(Xem chi tiết)</a>
+                        </button>
+                    }
+                </p>
+
+
+            </div>
+
+            <hr />
+            @foreach (CtDonHang a in DataIn.GetCtDonHangs(i.soDH))
+            {
+
+                <img style="width:100px;" src=" @DataIn.GetProductbyID(a.maSP).hinhDD" />
+                <b>(@string.Format("{0: dd/MM/yyyy}", i.ngayDat)) @DataIn.GetProductbyID(a.maSP).tenSP</b>
+                <b style="float:right; color:brown;">&emsp;(@a.soLuong)&emsp;@string.Format("{0:#,##0 VNĐ}", a.giaBan - (a.giaBan * a.giamGia / 100))</b>
+                <br />
+            }
+        </div>
+        <div class="Dd1" style="margin-bottom:2%;">
+            <ul>
+                <li>
+                    <p>
+                        Đơn hàng đang được xử lý và sẽ sớm giao đến bạn, cảm ơn bạn đã đặt hàng !
+                    </p>
+                </li>
+
+                @*<li style="float:right;">
+            @using (Html.BeginForm("XemChiTiet", "DonHangMua", FormMethod.Post))
+            {
+                <button name="maDH" value=" @i.soDH" class="btn btn-primary">Xem chi tiết</button>
+            }
+        </li>*@
+                @{
+                    if (i.trangThai == null || i.trangThai == "TC")
+                    {
+                        <li style="margin-left: 28%;">
+                            <button class="btn btn-success" onclick="clickThongBao()">Xác nhận</button>
+                        </li>
+                    }
+                }
+
+                <li style="float:right; margin-right: 2%;">
+                    @{
+                        if (i.trangThai == null || i.trangThai == "")
+                        {
+                            using (Html.BeginForm("HUY", "DonHangMua", FormMethod.Post))
+                            {
+                                <button style="padding-top:2%; padding-bottom:3%;" name="maDH" value=" @i.soDH" class="btn-danger">
+                                    Huỷ đơn
+                                </button>
+                            }
+                        }
+                        else if (i.trangThai == null || i.trangThai == "TC")
+                        {
+                            using (Html.BeginForm("HUY", "DonHangMua", FormMethod.Post))
+                            {
+                                <button style="padding-top:2%; padding-bottom:3%;" name="maDH" value=" @i.soDH" class="btn-close">
+                                    Yêu cầu trả hàng/hoàn tiền
+                                </button>
+                            }
+                        }
+                    }
+                </li>
+            </ul>
+        </div>
+
+
+    }
+    <br />
+    <!--<div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Mã đơn hàng</th>
+                    <th scope="col">Người bán</th>
+                    <th scope="col" style=" width: 300px; ">Sản phẩm</th>
+                    <th scope="col">Ngày đặt</th>
+                    <th scope="col">Ghi chú</th>
+                    <th scope="col">Trạng thái</th>
+                    <th scope="col">Chi tiết</th>
+                    <th scope="col">Yêu cầu</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DonHang i in (new EcommerceEntities().DonHangs.Where(m => m.tktv2 == t.TKTV).OrderByDescending(m => m.ngayDat).ToList()))
+                {
+                    <tr>
+                        <th scope="row">@i.soDH</th>
+                        <td>@i.tktv1</td>
+
+                        <td>
+                            @foreach (CtDonHang a in DataIn.GetCtDonHangs(i.soDH))
+                            {
+                                @DataIn.GetProductbyID(a.maSP).tenSP <b>&emsp;(@a.soLuong)&emsp;@string.Format("{0:#,##0 VNĐ}", a.giaBan - (a.giaBan * a.giamGia / 100))</b> <br />
+                                <hr />
+                            }
+                        </td>
+
+                        <td>@string.Format("{0: dd/MM/yyyy}", i.ngayDat)</td>
+                        <td>@i.ghiChu</td>
+                        <td>
+                            @{
+                                if (i.daKichHoat == true && (i.trangThai == null || i.trangThai == ""))
+                                {
+                                    <span class="btn btn-info">Đã xác nhận</span>
+                                }
+                                else if (i.daKichHoat == false && (i.trangThai == null || i.trangThai == ""))
+                                {
+                                    <span class="btn btn-info">Đang chờ <br />xác nhận</span>
+
+                                }
+                                else
+                                {
+                                    if (i.trangThai != null && i.trangThai.Equals("TC"))
+                                    {
+                                        <span class="btn btn-success">Thành công</span>
+                                    }
+                                    else if (i.trangThai != null && i.trangThai.Equals("HUY"))
+                                    {
+                                        <span class="btn btn-danger">Đã huỷ</span>
+                                    }
+                                    else if (i.trangThai != null && i.trangThai.Equals("ChL"))
+                                    {
+                                        <span class="btn btn-info">Chờ lấy hàng</span>
+                                    }
+                                    else if (i.trangThai != null && i.trangThai.Equals("DG"))
+                                    {
+                                        <span class="btn btn-info">Đang giao</span>
+                                    }
+                                    else if (i.trangThai != null && i.trangThai.Equals("TH"))
+                                    {
+                                        <span class="btn btn-primary">Trả hàng</span>
+                                    }
+                                }
+                            }
+
+                        </td>
+                        <td>
+                            @using (Html.BeginForm("XemChiTiet", "DonHangMua", FormMethod.Post))
+                            {
+                                <input type="hidden" name="maDH" value=" @i.soDH" />
+                                <button style="max-width:100%" class="btn btn-primary">Xem chi tiết</button>
+                            }
+                        </td>
+                        <td>
+                            @{
+                                if (i.trangThai == null || i.trangThai == "")
+                                {
+                                    using (Html.BeginForm("HUY", "DonHangMua", FormMethod.Post))
+                                    {
+                                        <input type="hidden" name="maDH" value=" @i.soDH" />
+                                        <button class=" btn-warning">
+                                            <i class="fa fa-solid fa-ban"></i>
+                                        </button>
+                                    }
+                                }
+                            }
+                        </td>
+
+                    </tr>
+                }-->
+    @*<tr>
+            <th scope="row">1</th>
+            <td>Khẩu trang 4 lớp</td>
+            <td>150.000</td>
+            <td>3</td>
+            <td>19:30 - 27/2/2023</td>
+            <td>
+                <button class="btn btn-info">Đặt hàng thành công</button>
+            </td>
+        </tr>*@
+    <!--</tbody>
+        </table>
+    </div>-->
+</div>
+
+<script>
+
+    function clickThongBao() { 
+        Swal.fire({
+            title: 'Bạn có muốn lưu hay không ?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Lưu',
+            denyButtonText: `Không lưu`,
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                Swal.fire('Lưu thành công', '', 'success')
+            } else if (result.isDenied) {
+                Swal.fire('Các thay đổi chưa được lưu', '', 'info')
+            }
+        })
+    }
+
+</script>

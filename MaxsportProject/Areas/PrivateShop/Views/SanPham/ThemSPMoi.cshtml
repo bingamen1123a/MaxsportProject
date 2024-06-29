@@ -1,0 +1,108 @@
+﻿@model Ecommerce_KTPM.Models.SanPham
+@using Ecommerce_KTPM.Models
+@{
+    List<NganhHang> listNganh = ViewData["listNganh"] as List<NganhHang>;
+    if (listNganh == null)
+    {
+        listNganh = DataIn.GetNganhHangs();
+    }
+    List<LoaiSP> listLoai = ViewData["listLoai"] as List<LoaiSP>;
+    ViewBag.Title = "Thêm sản phẩm mới";
+    Layout = "~/Areas/PrivateShop/Views/Shared/_Layout.cshtml";
+}
+
+<div class="bg-light rounded h-100 p-4">
+    <div class="option-locloaihang" style="margin-bottom: 10px;">
+        <h1 class="page-title-1">Đăng bán sản phẩm</h1>
+
+        @using (Html.BeginForm("LocNganh", "SanPham", FormMethod.Post))
+        {
+            <select name="maNganh" class="form-select-sm" aria-label=".form-select-sm example">
+                <option selected>Lọc theo ngành hàng</option>
+                @foreach (NganhHang i in listNganh)
+                {
+                    <option value="@i.maNganh">@i.tenNganh</option>
+                }
+            </select>
+            <input type="hidden" name="view" value="ThemSPMoi" />
+            <button type="submit">Lọc</button>
+        }
+    </div>
+    @{
+        if (@ViewBag.sc != null)
+        {
+            <p class="alert alert-success">@ViewBag.sc</p>}
+    }                    @{
+        if (@ViewBag.usc != null)
+        {
+            <p class="alert alert-danger">@ViewBag.usc</p>}
+    }
+    @using (Html.BeginForm("ThemSPMoi", "SanPham", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="form-floating mb-3">
+            @Html.TextBoxFor(m => m.tenSP, new { @class = "form-control", placeholder = "Nhập tên sản phẩm" })
+            <label for="">Tên sản phẩm</label>
+        </div>
+        <div class="form-floating mb-3">
+            @Html.TextAreaFor(m => m.ndTomTat, new { @class = "form-control", type = "text", placeholder = "Enter...", row = 2 })
+            <label for="">Mô tả sản phẩm</label>
+        </div>
+        <div class="form-floating mb-3">
+            @Html.DropDownListFor(m => m.maLoai, new SelectList(listLoai, "maLoai", "tenLoai"), "-- Chọn loại hàng --", new
+       {
+           @class = "form-select",
+           @id = "floatingSelect"@*,aria-label = "Floating label select example"*@})
+
+            <label for="floatingSelect">Loại hàng</label>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.giaBan, new { @class = "form-control" })
+                    <label for="">Mức giá</label>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.giamGia, new { @class = "form-control" })
+                    <label for="">Giảm giá (%)</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.dvt, new { @class = "form-control" })
+                    <label for="">Đơn vị tính (cái/ hộp)</label>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(m => m.nhaSanXuat, new { @class = "form-control" })
+                    <label for="">Nhà sản xuất</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-floating">
+            @Html.TextAreaFor(m => m.noiDung, new { @class = "form-control", id = "floatingTextarea", rows = 4, style = "height: 150px;", placeholder = "Leave a comment here" })
+            <label for="floatingTextarea">Chi tiết sản phẩm</label>
+        </div>
+        <div class="bg-light rounded p-4">
+            <h6 class="mb-4">Thêm hình ảnh</h6>
+            <div class="mb-3">
+                <label for="formFileMultiple" class="form-label">Ấn vào đây để thêm hình ảnh</label>
+                <input class="form-control" type="file" id="formFileMultiple" name="HinhDaiDien" multiple>
+            </div>
+        </div>
+        <button class="btn btn-primary w-100 m-2" type="submit">Đăng bán</button>
+        @Html.HiddenFor(m => m.maSP);
+
+    }
+
+</div>
+
+
+
+
+

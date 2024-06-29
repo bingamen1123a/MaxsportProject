@@ -1,0 +1,100 @@
+﻿@using Ecommerce_KTPM.Models
+
+@{
+    ViewBag.Title = "Danh sách tài khoản";
+    TaiKhoanTV t = Session["DangNhap"] as TaiKhoanTV;
+    Layout = "~/Areas/PrivateShop/Views/Shared/_LayoutQTV.cshtml";
+}
+<div style="overflow-y: scroll; height:450px;">
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-light text-center rounded p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">Tất cả tài khoản</h6>
+            </div>
+            @{
+                if (@ViewBag.sc != null)
+                {
+                    <p class="alert alert-success">@ViewBag.sc</p>}
+            }                    @{
+                if (@ViewBag.usc != null)
+                {
+                    <p class="alert alert-danger">@ViewBag.usc</p>}
+            }
+            <div class="">
+                <table id="orders" class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Username</th>
+                            <th onclick="sortTable(1)">Họ và tên</th>
+                            <th onclick="sortTable(2)">Thông tin liên lạc</th>
+                            <th onclick="sortTable(3)">Trạng thái</th>
+                            <th></th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in DataIn.GetTaiKhoanTVs().Where(m => m.TKTV != "admin" && m.TKTV != t.TKTV))
+                        {
+                            <tr>
+                                <td>@i.TKTV</td>
+                                <td>@i.hoDem @i.tenTV</td>
+                                <td>
+                                    @i.soDT<br />
+                                    @i.email<br />
+                                    @i.diaChi
+                                </td>
+                                <td>
+                                    @{
+                                        if (i.trangThai == true)
+                                        {
+                                            <span class="btn btn-outline-info">Đang hoạt động</span>
+                                        }
+                                        else if (i.trangThai == false)
+                                        {
+                                            <span class="btn btn-outline-warning">Đã khoá</span>
+                                        }
+                                    }
+
+                                </td>
+                                <td>
+                                    <div class="nav-item dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" style="border: 1px solid; background-color: #009CEE; color: white;">
+                                            <span class="d-none d-lg-inline-flex"><i class="arrow_drop_down_circle"></i></span>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                                            <a href="@Url.Action("ActiveTK","QTV",new {tktv=i.TKTV})" class="dropdown-item">
+                                                <h6 class="fw-normal mb-0">Kích hoạt lại</h6>
+                                            </a>
+                                            <hr class="dropdown-divider">
+                                            <a href="@Url.Action("LockTK","QTV",new {tktv=i.TKTV})" class="dropdown-item">
+                                                <h6 class="fw-normal mb-0">Khoá tài khoản</h6>
+                                            </a>
+                                            @{if (i.ghiChu == "")
+                                                {
+                                                    <hr class="dropdown-divider">
+                                                    <a href="@Url.Action("QuyenQT","QTV",new {tktv=i.TKTV})" class="dropdown-item">
+                                                        <h6 class="fw-normal mb-0">Kích hoạt quản trị</h6>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <hr class="dropdown-divider">
+                                                    <a href="@Url.Action("HuyQT","QTV",new {tktv=i.TKTV})" class="dropdown-item">
+                                                        <h6 class="fw-normal mb-0">Huỷ QT</h6>
+                                                    </a>
+                                                }
+
+                                            }
+
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pagination"></div>

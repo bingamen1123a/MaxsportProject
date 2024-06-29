@@ -1,0 +1,43 @@
+﻿@using Ecommerce_KTPM.Models
+@model Ecommerce_KTPM.Models.ThongBao
+@{
+    ViewBag.Title = "Gửi thông báo";
+    Layout = "~/Areas/PrivateShop/Views/Shared/_LayoutQTV.cshtml";
+    TaiKhoanTV t = Session["DangNhap"] as TaiKhoanTV;
+
+}
+
+@using (Html.BeginForm("GuiThongBao", "ThongBao", FormMethod.Post))
+{
+    <div>
+        <h1 class="page-title-1">Gửi thông báo:</h1>
+        @{
+            if (@ViewBag.usc != null)
+            {
+                <p class="alert alert-danger">@ViewBag.usc</p>}
+            if (@ViewBag.sc != null)
+            {
+                <p class="alert alert-success">@ViewBag.sc</p>
+            }
+        }
+        <div class="input-group mb-3" style="margin: 10px 10px 0 10px; width: 25%;">
+            <span class="input-group-text" id="basic-addon3">Gửi đến</span>
+            @Html.DropDownListFor(m => m.TKTV, new SelectList(Ecommerce_KTPM.Models.DataIn.GetTaiKhoanTVs().Where(m => m.TKTV != "admin"), "tktv", "tktv"), "-- Chọn thành viên --", new { @class = "form-control", @id = "basic-url" })
+        </div>
+        <div class="input-group mb-3" style="margin: 10px 10px 0 10px; width: 25%;">
+            <span class="input-group-text" id="basic-addon3">Chủ đề</span>
+            @Html.TextBoxFor(m => m.chuDe, new { type = "text", @class = "form-control", @id = "basic-url" })
+        </div>
+    </div>
+
+
+    <div>
+        <h1 class="page-title-1">Nội dung:</h1>
+        <div class="form-floating" style="margin: 10px 10px;">
+            @Html.TextAreaFor(m => m.noiDung, new { @class = "form-control", placeholder = "Leave a comment here", @id = "floatingTextarea", style = "height: 100px;" })
+            <label for="floatingTextarea">Comments</label>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success m-2">Gửi</button>
+    @Html.HiddenFor(m => m.TKTV, new { @value = t.TKTV })
+}

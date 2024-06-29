@@ -1,0 +1,165 @@
+﻿
+@{
+    ViewBag.Title = "Đăng ký";
+}
+@model Ecommerce_KTPM.Models.TaiKhoanTV
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://kit.fontawesome.com/64d58efce2.js"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="~/Assets/css/style.css" />
+    <title>Sign in & Sign up Form</title>
+</head>
+<body>
+    <div class="container sign-up-mode">
+        <div class="forms-container">
+            <div class="signin-signup">
+                @using (Html.BeginForm("Login", "SignIn", FormMethod.Post, new { @class = "sign-in-form" }))
+                {
+
+                    <h2 class="title">Đăng nhập</h2>
+                    {
+                        if (@ViewBag.sc != null)
+                        {
+                            <p class="alert alert-success">@ViewBag.sc</p>}
+                    }
+                    {
+                        if (ViewBag.mess != null)
+                        {
+                            <p class="alert alert-warning">@ViewBag.mess</p>
+                        }
+                    }
+                    <div class="input-field">
+                        <i class="fas fa-user"></i>
+                        @Html.TextBox("name", "", new { placeholder = "Tài khoản" })
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        @Html.Password("pass", "", new { type = "password", placeholder = "Mật khẩu" })
+                    </div>
+
+                    @*<a href="@Url.Action("TrangThai","TrangThai",new {Area = "DuLieuKhachHang"})"><input type="button" value="Đăng nhập" class="btn1 solid" /></a>*@
+                    <button type="submit" class="btn1 solid">Đăng nhập</button>
+                    @*<p class="social-text">Các phương thức đăng nhập khác</p>
+                    <div class="social-media">
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-google"></i>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>*@
+                    <div style="margin-top: 15px;"><a href="@Url.Action("Index","QuenMK")" style="font-weight: 550;">Quên mật khẩu</a></div>
+                }
+                @using (Html.BeginForm("SignUp", "SignIn", FormMethod.Post, new { @class = "sign-up-form" }))
+                {
+
+                    if (@ViewBag.usc != null)
+                    {
+                        <p class="alert alert-warning">@ViewBag.usc</p>}
+
+                    @*<h2 class="title">Đăng ký</h2>*@
+                    <div class="input-field">
+                        <i class="fas fa-user"></i>
+                        @Html.TextBoxFor(m => m.TKTV, new { placeholder = "Nhập Username" })
+                    </div>
+                    <div class="row dinhdang-formdki-1">
+                        <div class="col-md-6 dinhdang-formdki-2">
+                            <div class="input-field">
+                                <i class="fa-solid fa-file-signature"></i>
+                                @Html.TextBoxFor(m => m.hoDem, new { placeholder = "Nhập họ và tên đệm" })
+                            </div>
+                        </div>
+                        <div class="col-md-6 dinhdang-formdki-3">
+                            <div class="input-field">
+                                <i class="fa-solid fa-file-signature"></i>
+                                @Html.TextBoxFor(m => m.tenTV, new { placeholder = "Tên" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-field">
+                        <i class="fa-solid fa-phone"></i>
+                        @Html.TextBoxFor(m => m.soDT, new { placeholder = "Số điện thoại", autocomplete = "off" })
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-envelope"></i>
+                        @Html.TextBoxFor(m => m.email, new { type = "email", placeholder = "Email", autocomplete = "off" })
+                    </div>
+                    <div class="input-field">
+                        <i class="fa-solid fa-address-book"></i>
+                        @Html.TextBoxFor(m => m.diaChi, new { placeholder = "Địa chỉ", autocomplete = "off" })
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        @Html.TextBoxFor(m => m.matKhau, new { type = "password", placeholder = "Mật khẩu" })
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        @Html.TextBox("xnmk", "", new { type = "password", placeholder = "Nhập lại mật khẩu" })
+                    </div>
+                    <input type="submit" class="btn1" value="Đăng ký" />
+                    @*<p class="social-text">Or Sign up with social platforms</p>*@
+                    @*<div class="social-media">
+                <a href="#" class="social-icon">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-icon">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="social-icon">
+                    <i class="fab fa-google"></i>
+                </a>
+                <a href="#" class="social-icon">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>*@
+                }
+            </div>
+        </div>
+
+        <div class="panels-container">
+            <div class="panel left-panel">
+                <div class="content">
+                    <h3>Bạn có tài khoản chưa ?</h3>
+                    <p>
+                        Nếu chưa có thì hãy đăng ký ngay 1 tài khoản để mua sản phẩm của chúng tôi và được hưởng chính sách tốt nhất nhé.
+                    </p>
+                    <button class="btn1 transparent" id="sign-up-btn">
+                        Đăng ký
+                    </button>
+                </div>
+                <img src="~/Assets/img/log.svg" class="image" alt="" />
+            </div>
+            <div class="panel right-panel">
+                <div class="content">
+                    <h3>Bạn muốn mua sản phẩm ?</h3>
+                    <p>
+                        Hãy đăng nhập và mua sản phẩm của chúng tôi ngay để trải nghiệm được những ưu đãi tốt nhất.
+                    </p>
+                    <button class="btn1 transparent" id="sign-in-btn">
+                        Đăng nhập
+                    </button>
+                </div>
+                <img src="~/Assets/img/register.svg" class="image" alt="" />
+            </div>
+        </div>
+    </div>
+
+    <script src="~/Assets/js/app.js"></script>
+</body>
+</html>
+
+
+

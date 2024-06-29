@@ -1,0 +1,34 @@
+﻿@model Ecommerce_KTPM.Models.ThongBao
+
+@{
+    ViewBag.Title = "Gửi yêu cầu";
+}
+@{
+    if (@ViewBag.usc != null)
+    {
+        <p class="alert alert-danger">@ViewBag.usc</p>}
+}
+@using (Html.BeginForm("GuiYeuCau", "YeuCau", FormMethod.Post))
+{
+    <div>
+        <h1 class="page-title-1">Gửi yêu cầu:</h1>
+        <div class="input-group mb-3" style="margin: 10px 10px 0 10px; width: 25%;">
+            <span class="input-group-text" id="basic-addon3">Gửi đến</span>
+            <input type="text" class="form-control" id="basic-url" value="Quản trị viên" aria-describedby="basic-addon3" disabled />
+        </div>
+        <div class="input-group mb-3" style="margin: 10px 10px 0 10px; width: 25%;">
+            <span class="input-group-text" id="basic-addon3">Chủ đề</span>
+            @Html.TextBoxFor(m=>m.chuDe, new { type = "text" ,@class="form-control" ,@id="basic-url"})
+        </div>
+    </div>
+
+
+    <div>
+        <h1 class="page-title-1">Nội dung:</h1>
+        <div class="form-floating" style="margin: 10px 10px;">
+            @Html.TextAreaFor(m => m.noiDung, new { @class = "form-control", placeholder = "Leave a comment here", @id = "floatingTextarea", style = "height: 100px;" })
+            <label for="floatingTextarea">Comments</label>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success m-2">Gửi</button>
+}

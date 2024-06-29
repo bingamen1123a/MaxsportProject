@@ -1,0 +1,206 @@
+﻿@using Ecommerce_KTPM.Models
+@{
+    ViewBag.Title = "Trạng thái";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    TaiKhoanTV t = Session["DangNhap"] as TaiKhoanTV;
+
+}
+
+<style>
+    .avatar-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+    }
+
+    .icon-container {
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        height: 30px;
+        transform: translateX(-50%);
+        background-color: #ffffff;
+        padding: 5px;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+    }
+
+        .icon-container i {
+            color: #444444;
+            font-size: 20px;
+        }
+
+        .icon-container:hover i {
+            color: #007bff;
+        }
+</style>
+
+<div class="tongquan-khachhang row" style="max-width:100%">
+    <div class="khachhang-thongtin col-md-6">
+        <div class="dinhdang-thongtinkhachhang">
+            <h4>Thông tin khách hàng</h4>
+            <div class="row">
+                <div class="col-12">
+
+                    <div class="avatar-container">
+                        <img src="@t.hinhDD" alt="Avatar" class="avatar">
+                        @using (Html.BeginForm("DoiAVT", "TrangThai", FormMethod.Post, new {@id="form", enctype = "multipart/form-data" }))
+                        {
+                            <div class="icon-container">
+                                <label for="avatar-upload">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </label>
+                                <input type="file" id="avatar-upload" name="HinhDaiDien" accept="image/*" style="display:none">
+                            </div>
+                    }
+                        </div>
+                </div>
+                <div class="col-6">                    
+                    <div><span class="cl-white">Tên: @t.hoDem @t.tenTV</span></div>
+                    <div><span class="cl-white">Địa chỉ: @t.diaChi</span></div>
+                </div>
+                <div class="col-6">
+                    <div><span class="cl-white">SĐT: @t.soDT</span></div>
+                    <div><span class="cl-white">Email: @t.email</span></div>
+                </div>
+            </div>
+            <button class="btn btn-danger" style="margin: 10px 0;">
+                @Html.ActionLink("Cập nhật thông tin", "CapNhatThongTin", "TrangThai", null, new { style = "color:white;" })
+            </button>
+        </div>
+        @*<h4>Trạng thái đơn hàng</h4>
+            <div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Tên sản phẩm</th>
+                            <th scope="col">Giá bán</th>
+                            <th scope="col">Số lượng</th>
+                            <th scope="col">Ngày đặt</th>
+                            <th scope="col">Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Khẩu trang 4 lớp</td>
+                            <td>150.000</td>
+                            <td>3</td>
+                            <td>19:30 - 27/2/2023</td>
+                            <td>
+                                <button class="btn btn-info">Đang giao hàng</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>*@
+    </div>
+
+    <div class="khachhang-trangthai col-md-6">
+        <h4><a href="@Url.Action("DSDonHang","DonHangMua",new {area="PrivateShop"})" style="color:red;">Danh sách đơn hàng</a> mới</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col" style="color: black;">Mã đơn hàng</th>
+                    <th scope="col" style="color: black;">Người bán</th>
+                    <th scope="col" style="color: black;">Sản phẩm</th>
+                    <th scope="col" style="color: black; width:150px">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DonHang i in (new EcommerceEntities().DonHangs.Where(m => m.tktv2 == t.TKTV).OrderByDescending(m => m.ngayDat).ToList().Take(3)))
+                {
+                    <tr>
+                        <th scope="row" style="color: black;">@i.soDH</th>
+                        <td style="color: black;">@i.tktv1</td>
+                        <td>
+                            @foreach (CtDonHang a in DataIn.GetCtDonHangs(i.soDH))
+                            {
+                                @DataIn.GetProductbyID(a.maSP).tenSP
+                                <b>&emsp;(@a.soLuong)&emsp;@string.Format("{0:#,##0 VNĐ}", a.giaBan - (a.giaBan * a.giamGia / 100))</b>
+                                <br />
+                                <hr />
+                            }
+                        </td>
+                        <td>
+                            @{
+                                if (i.daKichHoat == true && (i.trangThai == null || i.trangThai == ""))
+                                {
+                                    <span class="btn btn-info">Đã xác nhận</span>
+                                }
+                                else if (i.daKichHoat == false && (i.trangThai == null || i.trangThai == ""))
+                                {
+                                    <span class="btn btn-info">Đang chờ <br />xác nhận</span>
+
+                                }
+                                else
+                                {
+                                    if (i.trangThai != null && i.trangThai.Equals("TC"))
+                                    {
+                                        <span class="btn btn-success">Thành công</span>
+                                    }
+                                    else if (i.trangThai != null && i.trangThai.Equals("HUY"))
+                                    {
+                                        <span class="btn btn-danger">Đã huỷ</span>
+                                    }
+                                    else if (i.trangThai != null && i.trangThai.Equals("ChL"))
+                                    {
+                                        <span class="btn btn-info">Chờ lấy hàng</span>
+                                    }
+                                    else if (i.trangThai != null && i.trangThai.Equals("DG"))
+                                    {
+                                        <span class="btn btn-info">Đang giao</span>
+                                    }
+                                    else if (i.trangThai != null && i.trangThai.Equals("TH"))
+                                    {
+                                        <span class="btn btn-primary">Trả hàng</span>
+                                    }
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+        <h4>Truy cập trang quản trị để bán hàng ngay
+        </h4>
+        <button class="btn btn-danger"><a style="color:white;" href="/PrivateShop/DashBoard/DashBoard">Truy cập ngay</a></button>
+    </div>
+</div>
+
+<script>
+    const editIcon = document.querySelector('.icon-container');
+    const avatarImage = document.querySelector('.avatar');
+    const avatarUpload = document.querySelector('#avatar-upload');
+
+    editIcon.addEventListener('click', () => {
+        avatarUpload.click();
+    });
+
+    avatarUpload.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            avatarImage.src = event.target.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+</script>
+<script>
+    document.getElementById("avatar-upload").onchange = function () {
+        setTimeout(function () {
+            document.getElementById("form").submit();
+        }, 2000);
+    };
+    
+</script>

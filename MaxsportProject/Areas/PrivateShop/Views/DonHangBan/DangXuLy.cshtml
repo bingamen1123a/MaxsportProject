@@ -1,0 +1,150 @@
+﻿@using Ecommerce_KTPM.Models
+
+@{
+    ViewBag.Title = "Đơn hàng đang xử lý";
+    Layout = "~/Areas/PrivateShop/Views/Shared/_Layout.cshtml";
+    TaiKhoanTV t = Session["DangNhap"] as TaiKhoanTV;
+    List<DonHang> list = ViewData["listDonHang"] as List<DonHang>;
+    if (list == null)
+    {
+        list = new EcommerceEntities().DonHangs.Where(m => m.daKichHoat == true && m.tktv1 == t.TKTV && m.trangThai != "TC" && m.trangThai != "HUY").OrderByDescending(m => m.ngayDat).ToList();
+    }
+}
+
+<div style="overflow-y: scroll; height:450px;">
+    <div class="container-fluid pt-4 px-4">
+        <div class="bg-light text-center rounded p-4">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h6 class="mb-0">Tất cả đơn hàng</h6>
+            </div>
+            <div class="">
+                <table id="orders" class="table text-start align-middle table-bordered table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Ngày đặt </th>
+                            <th onclick="sortTable(1)">Mã hàng </th>
+                            <th onclick="sortTable(2)">Thông tin khách</th>
+                            <th onclick="sortTable(3)">Địa chỉ giao </th>
+                            <th onclick="sortTable(4)">Sản phẩm </th>
+                            <th onclick="sortTable(6)">Hoạt động </th>
+                            <th onclick="sortTable(7)">Chuyển trạng thái</th>
+                            <th></th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (DonHang i in list)
+                        {
+                            <tr>
+                                <td>@string.Format("{0: dd/MM/yyyy}", i.ngayDat)</td>
+                                <td>@i.soDH</td>
+                                <td>
+                                    @DataIn.GetGiaoHang(i.tktv2).tenKH<br />
+                                    @DataIn.GetGiaoHang(i.tktv2).soDT
+                                </td>
+                                <td>@DataIn.GetGiaoHang(i.tktv2).diaChi</td>
+                                <td>
+                                    @foreach (CtDonHang a in DataIn.GetCtDonHangs(i.soDH))
+                                    {
+                                        @DataIn.GetProductbyID(a.maSP).tenSP
+                                        <b>&emsp;(@a.soLuong)&emsp;@string.Format("{0:#,##0 VNĐ}", a.giaBan - (a.giaBan * a.giamGia / 100))</b>
+                                        <br />
+                                        <hr />
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                                        if (i.daKichHoat == true && (i.trangThai == null || i.trangThai == ""))
+                                        {
+                                            <span class="btn btn-info">Đã xác nhận</span>
+                                        }
+                                        else if (i.daKichHoat == false && (i.trangThai == null || i.trangThai == ""))
+                                        {
+                                            <span class="btn btn-info">Đang chờ <br />xác nhận</span>
+
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("TC"))
+                                        {
+                                            <span class="btn btn-success">Thành công</span>
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("HUY"))
+                                        {
+                                            <span class="btn btn-danger">Đã huỷ</span>
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("ChL"))
+                                        {
+                                            <span class="btn btn-info">Chờ lấy hàng</span>
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("DG"))
+                                        {
+                                            <span class="btn btn-info">Đang giao</span>
+                                        }
+                                        else if (i.daKichHoat == true && i.trangThai != null && i.trangThai.Equals("TH"))
+                                        {
+                                            <span class="btn btn-primary">Trả hàng</span>
+                                        }
+
+                                    }
+
+                                </td>
+                                <td>
+                                    <div class="nav-item dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" style="border: 1px solid; background-color: #009CEE; color: white;">
+                                            <span class="d-none d-lg-inline-flex"><i class="arrow_drop_down_circle"></i></span>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                                            @using (Html.BeginForm("ChL", "DonHangBan", FormMethod.Post))
+                                            {
+                                                <input type="hidden" value="@i.soDH" name="maDH" />
+                                                <button type="submit" class="dropdown-item">
+                                                    <h6 class="fw-normal mb-0">Chờ vận chuyển</h6>
+                                                </button>
+
+                                            }
+                                            <hr class="dropdown-divider">
+
+                                            @using (Html.BeginForm("TC", "DonHangBan", FormMethod.Post))
+                                            {
+                                                <input type="hidden" value="@i.soDH" name="maDH" />
+                                                <button type="submit" class="dropdown-item">
+                                                    <h6 class="fw-normal mb-0">Thành công</h6>
+                                                </button>
+
+                                            }
+                                            <hr class="dropdown-divider">
+                                            @using (Html.BeginForm("HUY", "DonHangBan", FormMethod.Post))
+                                            {
+                                                <input type="hidden" value="@i.soDH" name="maDH" />
+                                                <button type="submit" class="dropdown-item">
+                                                    <h6 class="fw-normal mb-0">Đơn huỷ</h6>
+                                                </button>
+
+                                            }
+                                            <hr class="dropdown-divider">
+                                            @using (Html.BeginForm("TH", "DonHangBan", FormMethod.Post))
+                                            {
+                                                <input type="hidden" value="@i.soDH" name="maDH" />
+                                                <button type="submit" class="dropdown-item">
+                                                    <h6 class="fw-normal mb-0">Trả hàng</h6>
+                                                </button>
+
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @using (Html.BeginForm("XemChiTiet", "DonHangBan", FormMethod.Post))
+                                    {
+                                        <input type="hidden" name="maDH" value=" @i.soDH" />
+                                        <button class="btn btn-primary"><i class="fas fa-expand-arrows-alt"></i></button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pagination"></div>

@@ -1,0 +1,40 @@
+﻿@model Ecommerce_KTPM.Models.TaiKhoanTV
+@{
+    ViewBag.Title = "Đối mật khẩu Quản trị viên";
+    Layout = "~/Areas/PrivateShop/Views/Shared/_LayoutQTV.cshtml";
+}
+
+@using (Html.BeginForm("DoiMK", "TrangThai", FormMethod.Post, new { style = "margin: 0 auto" }))
+{
+
+    if (@ViewBag.scmk != null)
+    {
+        <p class="alert alert-success">@ViewBag.scmk</p>}
+
+
+    if (ViewBag.uscmk != null)
+    {
+        <p class="alert alert-warning">@ViewBag.uscmk</p>
+    }
+    <br />
+
+    <h3 style="margin-left: 20px; color: red;">Đổi mật khẩu quản trị</h3>
+    <div class="update-thongtin" style="margin-left: 20px; width: 30%;">
+        <div class="form-group">
+            <label for="usr">Mật khẩu hiện tại</label>
+            @Html.TextBoxFor(m => m.matKhau, new { @class = "form-control", type = "password", @id = "usr" })
+        </div>
+        <div class="form-group">
+            <label for="usr">Mật khẩu mới</label>
+            @Html.TextBox("mk", "", new { @class = "form-control", type = "password", @id = "usr" })
+        </div>
+        <div class="form-group">
+            <label for="usr">Nhập lại mật khẩu mới</label>
+            @Html.TextBox("xnmk", "", new { @class = "form-control", type = "password", @id = "usr" })
+        </div>
+        <br />
+
+        <button class="btn btn-success" type="submit">Cập nhật</button>
+    </div>
+    @Html.HiddenFor(m => m.TKTV);
+}
